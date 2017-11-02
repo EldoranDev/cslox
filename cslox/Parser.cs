@@ -15,16 +15,65 @@ namespace cslox
             _tokens = new List<Token>(tokens);
         }
 
-        public Expr Parse()
+        public List<Stmt> Parse()
+        {
+            var statments = new List<Stmt>();
+
+            while (!IsAtEnd())
+            {
+                statments.Add(Declaration());
+            }
+
+            return statments;
+        }
+
+        private Stmt Declaration()
         {
             try
             {
-                return Expression();
-            }
-            catch (ParseError error)
+                if (Match(VAR)) return VarDeclaration();
+
+                return Statement();
+            } catch(ParseError error)
             {
+                Synchronize();
                 return null;
             }
+        }
+
+        private Stmt VarDeclaration()
+        {
+            Token name = Consume(IDENTIFIER, "Expect variable name.");
+
+            Expr initializer = null;
+            if (Match(EQUAL))
+            {
+                initializer = Expression();
+            }
+
+            Consume(SEMICOLON, "Expect ';' after variable declaration.");
+            return new Stmt.Var(name, initializer);
+        }
+
+        private Stmt Statement()
+        {
+            if (Match(PRINT)) return PrintStatement();
+
+            return ExpressionStatement();
+        }
+
+        private Stmt PrintStatement()
+        {
+            Expr value = Expression();
+            Consume(SEMICOLON, "Expect ';' after value.");
+            return new Stmt.Print(value);
+        }
+
+        private Stmt ExpressionStatement()
+        {
+            Expr expr = Expression();
+            Consume(SEMICOLON, "Expect ';' after expression.");
+            return new Stmt.Expression(expr);
         }
 
         private Expr Expression()
@@ -36,7 +85,7 @@ namespace cslox
         {
             var expr = Comparison();
 
-            while (match(BANG_EQUAL, EQUAL_EQUAL))
+            while (Match(BANG_EQUAL, EQUAL_EQUAL))
             {
                 Token op = Previous();
                 Expr right = Comparison();
@@ -50,7 +99,7 @@ namespace cslox
         {
             Expr expr = Addition();
 
-            while (match(GREATER, GREATER_EQUAL, LESS, LESS, EQUAL))
+            while (Match(GREATER, GREATER_EQUAL, LESS, LESS, EQUAL))
             {
                 Token op = Previous();
                 Expr right = Addition();
@@ -64,7 +113,7 @@ namespace cslox
         {
             Expr expr = Multiplication();
 
-            while (match(MINUS, PLUS))
+            while (Match(MINUS, PLUS))
             {
                 Token op = Previous();
                 Expr right = Multiplication();
@@ -78,7 +127,7 @@ namespace cslox
         {
             Expr expr = Unary();
             
-            while(match(SLASH, STAR))
+            while(Match(SLASH, STAR))
             {
                 Token op = Previous();
                 Expr right = Unary();
@@ -90,7 +139,7 @@ namespace cslox
 
         private Expr Unary()
         {
-            if(match(BANG, MINUS))
+            if(Match(BANG, MINUS))
             {
                 Token op = Previous();
                 Expr right = Unary();
@@ -102,16 +151,21 @@ namespace cslox
 
         private Expr Primary()
         {
-            if (match(FALSE)) return new Expr.Literal(false);
-            if (match(TRUE)) return new Expr.Literal(true);
-            if (match(NIL)) return new Expr.Literal(null);
+            if (Match(FALSE)) return new Expr.Literal(false);
+            if (Match(TRUE)) return new Expr.Literal(true);
+            if (Match(NIL)) return new Expr.Literal(null);
 
-            if(match(NUMBER, STRING))
+            if(Match(NUMBER, STRING))
             {
                 return new Expr.Literal(Previous().Literal);
             }
 
-            if(match(LEFT_PAREN))
+            if(Match(IDENTIFIER))
+            {
+                return new Expr.Variable(Previous());
+            }
+
+            if(Match(LEFT_PAREN))
             {
                 Expr expr = Expression();
                 Consume(RIGHT_PAREN, "Expect ')' after expression");
@@ -158,7 +212,7 @@ namespace cslox
             return new ParseError();
         }
 
-        private bool match(params TokenType[] types)
+        private bool Match(params TokenType[] types)
         {
             foreach (var type in types)
             {

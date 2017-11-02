@@ -9,6 +9,9 @@ namespace cslox
         /// Inidicates if the cslox interpreter had an error
         /// </summary>
         private static bool _hadError = false;
+        private static bool _hadRuntimeError = false;
+
+        private static readonly Interpreter interpreter = new Interpreter();
 
         static int Main(string[] args)
         {
@@ -26,6 +29,7 @@ namespace cslox
             }
 
             if (_hadError) return 65;
+            if (_hadRuntimeError) return 70;
 
             return 0;
         }
@@ -58,11 +62,12 @@ namespace cslox
             var tokens = scanner.GetTokens();
 
             var parser = new Parser(tokens);
-            var expression = parser.Parse();
+            var statements = parser.Parse();
 
             if (_hadError) return;
 
-            Console.WriteLine(new AstPrinter().Print(expression));
+            //Console.WriteLine(new AstPrinter().Print(expression));
+            interpreter.Interpret(statements);
         }
 
         public static void Error(int line, string message)
@@ -79,6 +84,12 @@ namespace cslox
             {
                 Report(token.Line, $" at '{token.Lexeme}'", message);
             }
+        }
+
+        public static void RuntimeError(RuntimeError error)
+        {
+            Console.Error.WriteLine($"{error.Message}\n[line {error.Token.Line}]");
+            _hadRuntimeError = true;
         }
 
         private static void Report(int line, string where, string message)

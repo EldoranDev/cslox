@@ -24,7 +24,15 @@ namespace cslox_generate_ast
                 "Binary : Expr Left, Token Op, Expr Right",
                 "Grouping : Expr Expression",
                 "Literal : object Value",
-                "Unary: Token Op, Expr Right"
+                "Unary : Token Op, Expr Right",
+                "Variable : Token Name"
+            });
+
+            defineAst(outputDir, "Stmt", new[]
+            {
+                "Expression : Expr expression",
+                "Print : Expr expression",
+                "Var : Token name, Expr initializer"
             });
 
             return 0;

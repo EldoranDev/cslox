@@ -34,6 +34,11 @@ namespace cslox
             return parenthesize(expr.Op.Lexeme, expr.Right);
         }
 
+        public string VisitVariableExpr(Expr.Variable expr)
+        {
+            return parenthesize("VAR", expr);
+        }
+
         private string parenthesize(string name, params Expr[] exprs)
         {
             StringBuilder builder = new StringBuilder();
