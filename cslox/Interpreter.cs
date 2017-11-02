@@ -39,6 +39,12 @@ namespace cslox
             return null;
         }
 
+        public object VisitBlockStmt(Stmt.Block stmt)
+        {
+            ExecuteBlock(stmt.Statements, new Environment(environment));
+            return null;
+        }
+
         public object VisitVarStmt(Stmt.Var stmt)
         {
             object value = null;
@@ -49,6 +55,14 @@ namespace cslox
 
             environment.Define(stmt.name.Lexeme, value);
             return null;
+        }
+
+        public object VisitAssignExpr(Expr.Assign expr)
+        {
+            object value = Evaluate(expr.Value);
+
+            environment.Assign(expr.name, value);
+            return value;
         }
 
         public object VisitBinaryExpr(Expr.Binary expr)
@@ -185,6 +199,25 @@ namespace cslox
         private void Execute(Stmt stmt)
         {
             stmt.Accept(this);
+        }
+
+        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        {
+            var previous = this.environment;
+
+            try
+            {
+                this.environment = environment;
+
+                statements.ForEach((e) =>
+                {
+                    Execute(e);
+                });
+            }
+            finally
+            {
+                this.environment = previous;
+            }
         }
     }
 }

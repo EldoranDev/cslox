@@ -58,8 +58,23 @@ namespace cslox
         private Stmt Statement()
         {
             if (Match(PRINT)) return PrintStatement();
+            if (Match(LEFT_BRACE)) return new Stmt.Block(Block());
 
             return ExpressionStatement();
+        }
+
+        private List<Stmt> Block()
+        {
+            var statements = new List<Stmt>();
+
+            while(!Check(RIGHT_BRACE) && !IsAtEnd())
+            {
+                statements.Add(Declaration());
+            }
+
+            Consume(RIGHT_BRACE, "Expect '}' after block.");
+
+            return statements;
         }
 
         private Stmt PrintStatement()
@@ -78,7 +93,29 @@ namespace cslox
 
         private Expr Expression()
         {
-            return Equality();
+            return Assignement();
+        }
+
+        private Expr Assignement()
+        {
+            var expr = Equality();
+
+            if(Match(EQUAL))
+            {
+                var equals = Previous();
+
+                var value = Assignement();
+
+                if(expr is Expr.Variable)
+                {
+                    Token name = ((Expr.Variable)expr).Name;
+                    return new Expr.Assign(name, value);
+                }
+
+                Error(equals, "Invalid assignment target.");
+            }
+
+            return expr;
         }
 
         private Expr Equality()
@@ -99,7 +136,7 @@ namespace cslox
         {
             Expr expr = Addition();
 
-            while (Match(GREATER, GREATER_EQUAL, LESS, LESS, EQUAL))
+            while (Match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
             {
                 Token op = Previous();
                 Expr right = Addition();

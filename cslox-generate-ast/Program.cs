@@ -21,6 +21,7 @@ namespace cslox_generate_ast
 
             defineAst(outputDir, "Expr", new[]
             {
+                "Assign : Token name, Expr Value",
                 "Binary : Expr Left, Token Op, Expr Right",
                 "Grouping : Expr Expression",
                 "Literal : object Value",
@@ -30,6 +31,7 @@ namespace cslox_generate_ast
 
             defineAst(outputDir, "Stmt", new[]
             {
+                "Block: List<Stmt> Statements",
                 "Expression : Expr expression",
                 "Print : Expr expression",
                 "Var : Token name, Expr initializer"
@@ -45,6 +47,8 @@ namespace cslox_generate_ast
             using (var file = File.Create(path))
             {
                 using (var writer = new StreamWriter(file, Encoding.UTF8)) {
+                    writer.WriteLine("using System.Collections.Generic;");
+                    writer.WriteLine();
                     writer.WriteLine("namespace cslox {");
                     writer.WriteLine("\tabstract class " + baseName + " {");
 

@@ -18,6 +18,11 @@ namespace cslox
             return parenthesize(expr.Op.Lexeme, expr.Left, expr.Right);
         }
 
+        public string VisitAssignExpr(Expr.Assign expr)
+        {
+            return parenthesize(expr.name.Lexeme, expr.Value);
+        }
+
         public string VisitGroupingExpr(Expr.Grouping expr)
         {
             return parenthesize("group", expr.Expression);

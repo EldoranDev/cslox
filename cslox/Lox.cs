@@ -52,6 +52,9 @@ namespace cslox
             {
                 Console.Write(">");
                 run(Console.ReadLine());
+
+                _hadError = false;
+                _hadRuntimeError = false;
             }
         }
 

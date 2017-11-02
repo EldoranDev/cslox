@@ -1,12 +1,30 @@
-﻿namespace cslox
+﻿using System.Collections.Generic;
+
+namespace cslox
 {
     abstract class Stmt
     {
         public interface IVisitor<T>
         {
+            T VisitBlockStmt(Block stmt);
             T VisitExpressionStmt(Expression stmt);
             T VisitPrintStmt(Print stmt);
             T VisitVarStmt(Var stmt);
+        }
+
+        public class Block : Stmt
+        {
+            public Block(List<Stmt> Statements)
+            {
+                this.Statements = Statements;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitBlockStmt(this);
+            }
+
+            public readonly List<Stmt> Statements;
         }
 
         public class Expression : Stmt
