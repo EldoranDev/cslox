@@ -3,7 +3,7 @@ using System.IO;
 
 namespace cslox
 {
-    class Program
+    class Lox
     {
         /// <summary>
         /// Inidicates if the cslox interpreter had an error
@@ -57,18 +57,31 @@ namespace cslox
 
             var tokens = scanner.GetTokens();
 
-            foreach (var item in tokens)
+            var parser = new Parser(tokens);
+            var expression = parser.Parse();
+
+            if (_hadError) return;
+
+            Console.WriteLine(new AstPrinter().Print(expression));
+        }
+
+        public static void Error(int line, string message)
+        {
+            Report(line, "", message);
+        }
+
+        public static void Error(Token token, string message)
+        {
+            if(token.Type == TokenType.EOF)
             {
-                Console.WriteLine(item);
+                Report(token.Line, " at end", message);
+            } else
+            {
+                Report(token.Line, $" at '{token.Lexeme}'", message);
             }
         }
 
-        public static void error(int line, string message)
-        {
-            report(line, "", message);
-        }
-
-        private static void report(int line, string where, string message)
+        private static void Report(int line, string where, string message)
         {
             Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
             _hadError = true;

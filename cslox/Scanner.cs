@@ -122,7 +122,7 @@ namespace cslox
                     }
                     else
                     {
-                        Program.error(_line, "Unexpected character.");
+                        Lox.Error(_line, "Unexpected character.");
                     }
 
                     break;
@@ -188,7 +188,7 @@ namespace cslox
 
             if(IsAtEnd())
             {
-                Program.error(_line, "Unterminated string.");
+                Lox.Error(_line, "Unterminated string.");
             }
             Advance();
 

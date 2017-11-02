@@ -8,7 +8,7 @@ namespace cslox
 {
     class AstPrinter : Expr.IVisitor<String>
     {
-        string print(Expr expr)
+        public string Print(Expr expr)
         {
             return expr.Accept(this);
         }
