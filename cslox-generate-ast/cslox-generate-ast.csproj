@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FFCCA30E-8CE0-4D71-937E-AF44A5814860}</ProjectGuid>
+    <ProjectGuid>{8CC4F558-7B00-4D26-A9DD-F9ACDA104F3D}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>cslox</RootNamespace>
-    <AssemblyName>cslox</AssemblyName>
+    <RootNamespace>cslox_generate_ast</RootNamespace>
+    <AssemblyName>cslox-generate-ast</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -42,12 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Expr.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scanner.cs" />
-    <Compile Include="Token.cs" />
-    <Compile Include="TokenType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
