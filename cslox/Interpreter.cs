@@ -10,7 +10,15 @@ namespace cslox
 {
     class Interpreter : Expr.IVisitor<object>, Stmt.IVisitor<object>
     {
-        private Environment environment = new Environment();
+        internal readonly Environment globals = new Environment();
+        private Environment environment;
+
+        public Interpreter()
+        {
+            environment = globals;
+
+            globals.Define("clock", new natives.clock());
+        }
 
         public void Interpret(List<Stmt> statements)
         {
@@ -45,6 +53,27 @@ namespace cslox
             return null;
         }
 
+        public object VisitFunctionStmt(Stmt.Function stmt)
+        {
+            var function = new LoxFunction(stmt, environment);
+
+            environment.Define(stmt.name.Lexeme, function);
+            return null;
+        }
+        
+        public object VisitIfStmt(Stmt.If stmt)
+        {
+            if (IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                Execute(stmt.ElseBranch);
+            }
+            return null;
+        }
+
         public object VisitVarStmt(Stmt.Var stmt)
         {
             object value = null;
@@ -54,6 +83,27 @@ namespace cslox
             }
 
             environment.Define(stmt.name.Lexeme, value);
+            return null;
+        }
+
+        public object VisitReturnStmt(Stmt.Return stmt)
+        {
+            object value = null;
+            if(stmt.Value != null)
+            {
+                value = Evaluate(stmt.Value);
+            }
+
+            throw new Return(value);
+        }
+
+        public object VisitWhileStmt(Stmt.While stmt)
+        {
+            while(IsTruthy(Evaluate(stmt.Condition)))
+            {
+                Execute(stmt.Body);
+            }
+
             return null;
         }
 
@@ -112,6 +162,32 @@ namespace cslox
             return null;
         }
 
+        public object VisitCallExpr(Expr.Call expr)
+        {
+            var callee = Evaluate(expr.Callee);
+
+            var arguments = new List<object>();
+
+            expr.Arguments.ForEach((e) =>
+            {
+                arguments.Add(Evaluate(e));
+            });
+
+            if(!(callee is ILoxCallable))
+            {
+                throw new RuntimeError(expr.Paren, "Can only call functions and classes.");
+            }
+
+            var function = callee as ILoxCallable;
+
+            if (arguments.Count != function.Arity)
+            {
+                throw new RuntimeError(expr.Paren, $"Expected {function.Arity} arguments but got {arguments.Count}.");
+            }
+
+            return function.Call(this, arguments);
+        }
+
         public object VisitGroupingExpr(Expr.Grouping expr)
         {
             return Evaluate(expr.Expression);
@@ -120,6 +196,20 @@ namespace cslox
         public object VisitLiteralExpr(Expr.Literal expr)
         {
             return expr.Value;
+        }
+
+        public object VisitLogicalExpr(Expr.Logical expr)
+        {
+            object left = Evaluate(expr.Left);
+            if(expr.Op.Type == OR)
+            {
+                if (IsTruthy(left)) return left;
+            } else
+            {
+                if (!IsTruthy(left)) return left;
+            }
+
+            return Evaluate(expr.Right);
         }
 
         public object VisitUnaryExpr(Expr.Unary expr)
@@ -201,7 +291,7 @@ namespace cslox
             stmt.Accept(this);
         }
 
-        private void ExecuteBlock(List<Stmt> statements, Environment environment)
+        internal void ExecuteBlock(List<Stmt> statements, Environment environment)
         {
             var previous = this.environment;
 

@@ -46,6 +46,9 @@
     <Compile Include="Environment.cs" />
     <Compile Include="Expr.cs" />
     <Compile Include="Interpreter.cs" />
+    <Compile Include="ILoxCallable.cs" />
+    <Compile Include="natives\clock.cs" />
+    <Compile Include="LoxFunction.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Lox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

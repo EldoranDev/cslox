@@ -8,8 +8,10 @@ namespace cslox
         {
             T VisitAssignExpr(Assign expr);
             T VisitBinaryExpr(Binary expr);
+            T VisitCallExpr(Call expr);
             T VisitGroupingExpr(Grouping expr);
             T VisitLiteralExpr(Literal expr);
+            T VisitLogicalExpr(Logical expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -50,6 +52,25 @@ namespace cslox
             public readonly Expr Right;
         }
 
+        public class Call : Expr
+        {
+            public Call(Expr Callee, Token Paren, List<Expr> Arguments)
+            {
+                this.Callee = Callee;
+                this.Paren = Paren;
+                this.Arguments = Arguments;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitCallExpr(this);
+            }
+
+            public readonly Expr Callee;
+            public readonly Token Paren;
+            public readonly List<Expr> Arguments;
+        }
+
         public class Grouping : Expr
         {
             public Grouping(Expr Expression)
@@ -78,6 +99,25 @@ namespace cslox
             }
 
             public readonly object Value;
+        }
+
+        public class Logical : Expr
+        {
+            public Logical(Expr Left, Token Op, Expr Right)
+            {
+                this.Left = Left;
+                this.Op = Op;
+                this.Right = Right;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitLogicalExpr(this);
+            }
+
+            public readonly Expr Left;
+            public readonly Token Op;
+            public readonly Expr Right;
         }
 
         public class Unary : Expr

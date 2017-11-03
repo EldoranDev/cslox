@@ -60,5 +60,15 @@ namespace cslox
 
             return builder.ToString();
         }
+
+        public string VisitLogicalExpr(Expr.Logical expr)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string VisitCallExpr(Expr.Call expr)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

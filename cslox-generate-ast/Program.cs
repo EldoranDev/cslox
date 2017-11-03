@@ -23,8 +23,10 @@ namespace cslox_generate_ast
             {
                 "Assign : Token name, Expr Value",
                 "Binary : Expr Left, Token Op, Expr Right",
+                "Call: Expr Callee, Token Paren, List<Expr> Arguments",
                 "Grouping : Expr Expression",
                 "Literal : object Value",
+                "Logical: Expr Left, Token Op, Expr Right",
                 "Unary : Token Op, Expr Right",
                 "Variable : Token Name"
             });
@@ -33,8 +35,12 @@ namespace cslox_generate_ast
             {
                 "Block: List<Stmt> Statements",
                 "Expression : Expr expression",
+                "Function : Token name, List<Token> parameters, List<Stmt> Body",
+                "If: Expr Condition, Stmt ThenBranch, Stmt ElseBranch",
                 "Print : Expr expression",
-                "Var : Token name, Expr initializer"
+                "Return: Token Keyword, Expr Value",
+                "Var : Token name, Expr initializer",
+                "While : Expr Condition, Stmt Body"
             });
 
             return 0;
