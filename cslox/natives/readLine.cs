@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace cslox.natives
 {
-    class Clock : ILoxCallable
+    class ReadLine : ILoxCallable
     {
         public int Arity => 0;
 
         public object Call(Interpreter interpreter, List<object> arguments)
         {
-            return (double)DateTimeOffset.Now.ToUnixTimeMilliseconds() / 1000.0;
+            return Console.ReadLine();
         }
     }
 }

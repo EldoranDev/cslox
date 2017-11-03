@@ -183,7 +183,7 @@ namespace cslox
             return body;
         }
         
-        private Stmt ReturnStatment()
+        private Stmt ReturnStatement()
         {
             var keyword = Previous();
             Expr value = null;

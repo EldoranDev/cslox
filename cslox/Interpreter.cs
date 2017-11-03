@@ -17,7 +17,8 @@ namespace cslox
         {
             environment = globals;
 
-            globals.Define("clock", new natives.clock());
+            globals.Define("clock", new natives.Clock());
+            globals.Define("readLine", new natives.ReadLine());
         }
 
         public void Interpret(List<Stmt> statements)

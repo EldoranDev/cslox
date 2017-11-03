@@ -27,13 +27,14 @@ namespace cslox
             {
                 environment.Define(_declaration.parameters[i].Lexeme, arguments[i]);
             }
+
             try
             {
                 interpreter.ExecuteBlock(_declaration.Body, environment);
             }
             catch (Return returnValue)
             {
-                return returnValue;
+                return returnValue.Value;
             }
 
             return null;
