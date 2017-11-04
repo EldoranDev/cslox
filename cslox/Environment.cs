@@ -12,6 +12,28 @@ namespace cslox
 
         private readonly Environment enclosing;
 
+        internal void Assign(Token name, object value)
+        {
+            if (values.ContainsKey(name.Lexeme))
+            {
+                values[name.Lexeme] = value;
+                return;
+            }
+
+            if (enclosing != null)
+            {
+                enclosing.Assign(name, value);
+                return;
+            }
+
+            throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");
+        }
+
+        internal void AssignAt(int distance, Token name, object value)
+        {
+            Ancestor(distance).values[name.Lexeme] = value;
+        }
+
         internal void Define(string name, object value)
         {
             values[name] = value;
@@ -39,21 +61,24 @@ namespace cslox
             throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");
         }
 
-        internal void Assign(Token name, object value)
+        internal object GetAt(int dist, string name)
         {
-            if (values.ContainsKey(name.Lexeme))
-            {
-                values[name.Lexeme] = value;
-                return;
-            }
-
-            if(enclosing != null)
-            {
-                enclosing.Assign(name, value);
-                return;
-            }
-
-            throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");
+            var vals = Ancestor(dist).values;
+        
+            return vals.ContainsKey(name) ? vals[name] : null;
         }
+
+        internal Environment Ancestor(int dist)
+        {
+            if(dist == 0)
+            {
+                return this;
+            } else
+            {
+                return enclosing.Ancestor(dist - 1);
+            }
+        }
+
+
     }
 }

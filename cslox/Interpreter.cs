@@ -13,6 +13,8 @@ namespace cslox
         internal readonly Environment globals = new Environment();
         private Environment environment;
 
+        private Dictionary<Expr, int> locals = new Dictionary<Expr, int>();
+
         public Interpreter()
         {
             environment = globals;
@@ -112,7 +114,14 @@ namespace cslox
         {
             object value = Evaluate(expr.Value);
 
-            environment.Assign(expr.name, value);
+            if (locals.ContainsKey(expr))
+            {
+                environment.AssignAt(locals[expr], expr.name, value);
+            }
+            else
+            {
+                environment.Assign(expr.name, value);
+            }
             return value;
         }
 
@@ -231,7 +240,7 @@ namespace cslox
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            return environment.Get(expr.Name);
+            return LookUpVariable(expr.Name, expr);
         }
 
         /// <summary>
@@ -309,6 +318,22 @@ namespace cslox
             {
                 this.environment = previous;
             }
+        }
+
+        object LookUpVariable(Token name, Expr expr)
+        {
+            if(locals.ContainsKey(expr))
+            {
+                return environment.GetAt(locals[expr], name.Lexeme);
+            } else
+            {
+                return globals.Get(name);
+            }
+        }
+
+        internal void Resolve(Expr expr, int depth)
+        {
+            locals.Add(expr, depth);
         }
     }
 }

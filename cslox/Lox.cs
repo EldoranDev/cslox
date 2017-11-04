@@ -65,7 +65,13 @@ namespace cslox
             var tokens = scanner.GetTokens();
 
             var parser = new Parser(tokens);
+
+            var resolver = new Resolver(interpreter);
             var statements = parser.Parse();
+
+            if (_hadError) return;
+
+            resolver.Resolve(statements);
 
             if (_hadError) return;
 
