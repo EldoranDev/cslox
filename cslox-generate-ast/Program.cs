@@ -24,9 +24,11 @@ namespace cslox_generate_ast
                 "Assign : Token name, Expr Value",
                 "Binary : Expr Left, Token Op, Expr Right",
                 "Call: Expr Callee, Token Paren, List<Expr> Arguments",
+                "Get: Expr obj, Token name",
                 "Grouping : Expr Expression",
                 "Literal : object Value",
                 "Logical: Expr Left, Token Op, Expr Right",
+                "Set : Expr Obj, Token Name, Expr Value",
                 "Unary : Token Op, Expr Right",
                 "Variable : Token Name"
             });
@@ -34,6 +36,7 @@ namespace cslox_generate_ast
             defineAst(outputDir, "Stmt", new[]
             {
                 "Block: List<Stmt> Statements",
+                "Class: Token Name, List<Stmt.Function> Methods",
                 "Expression : Expr expression",
                 "Function : Token name, List<Token> parameters, List<Stmt> Body",
                 "If: Expr Condition, Stmt ThenBranch, Stmt ElseBranch",

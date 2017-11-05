@@ -1,0 +1,26 @@
+{
+    "name": "lox",
+    "displayName": "lox",
+    "description": "Lox Language Support",
+    "version": "0.0.1",
+    "publisher": "EldoranDev",
+    "engines": {
+        "vscode": "^1.17.0"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "lox",
+            "aliases": ["Lox", "lox"],
+            "extensions": [".lox"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "lox",
+            "scopeName": "source.lox",
+            "path": "./syntaxes/lox.tmLanguage.json"
+        }]
+    }
+}

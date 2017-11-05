@@ -172,6 +172,14 @@ namespace cslox
             return null;
         }
 
+        public object VisitClassStmt(Stmt.Class stmt)
+        {
+            environment.Define(stmt.Name.Lexeme, null);
+            var cls = new LoxClass(stmt.Name.Lexeme);
+            environment.Assign(stmt.Name, cls);
+            return null;
+        }
+
         public object VisitCallExpr(Expr.Call expr)
         {
             var callee = Evaluate(expr.Callee);
@@ -334,6 +342,32 @@ namespace cslox
         internal void Resolve(Expr expr, int depth)
         {
             locals.Add(expr, depth);
+        }
+
+        public object VisitGetExpr(Expr.Get expr)
+        {
+            var obj = Evaluate(expr.obj);
+
+            if(obj is LoxInstance)
+            {
+                return ((LoxInstance)obj).Get(expr.name);
+            }
+
+            throw new RuntimeError(expr.name, "Only instances have properties.");
+        }
+
+        public object VisitSetExpr(Expr.Set expr)
+        {
+            var obj = Evaluate(expr.Obj);
+
+            if(!(obj is LoxInstance))
+            {
+                throw new RuntimeError(expr.Name, "Only instances have fields.");
+            }
+
+            var value = Evaluate(expr.Value);
+            (obj as LoxInstance).Set(expr.Name, value);
+            return value;
         }
     }
 }

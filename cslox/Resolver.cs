@@ -42,6 +42,13 @@ namespace cslox
             return null;
         }
 
+        public object VisitClassStmt (Stmt.Class stmt)
+        {
+            Declare(stmt.Name);
+            Define(stmt.Name);
+            return null;
+        }
+
         public object VisitCallExpr(Expr.Call expr)
         {
             Resolve(expr.Callee);
@@ -127,7 +134,7 @@ namespace cslox
 
         public object VisitVariableExpr(Expr.Variable expr)
         {
-            if(!scopes.Any() && scopes.Peek()[expr.Name.Lexeme] == false)
+            if(scopes.Any() && scopes.Peek()[expr.Name.Lexeme] == false)
             {
                 Lox.Error(expr.Name, "Cannot read local variable in its own initializer.");
             }
@@ -226,6 +233,20 @@ namespace cslox
                     return;
                 }
             }
+        }
+
+        public object VisitGetExpr(Expr.Get expr)
+        {
+            Resolve(expr.obj);
+            return null;
+        }
+
+        public object VisitSetExpr(Expr.Set expr)
+        {
+            Resolve(expr.Value);
+            Resolve(expr.Obj);
+
+            return null;
         }
     }
 }

@@ -45,8 +45,11 @@
     <Compile Include="AstPrinter.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="Expr.cs" />
+    <Compile Include="FunctionType.cs" />
     <Compile Include="Interpreter.cs" />
     <Compile Include="ILoxCallable.cs" />
+    <Compile Include="LoxClass.cs" />
+    <Compile Include="LoxInstance.cs" />
     <Compile Include="natives\Clock.cs" />
     <Compile Include="LoxFunction.cs" />
     <Compile Include="natives\ReadLine.cs" />
