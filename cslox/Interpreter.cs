@@ -58,7 +58,7 @@ namespace cslox
 
         public object VisitFunctionStmt(Stmt.Function stmt)
         {
-            var function = new LoxFunction(stmt, environment);
+            var function = new LoxFunction(stmt, environment, false);
 
             environment.Define(stmt.name.Lexeme, function);
             return null;
@@ -175,8 +175,18 @@ namespace cslox
         public object VisitClassStmt(Stmt.Class stmt)
         {
             environment.Define(stmt.Name.Lexeme, null);
-            var cls = new LoxClass(stmt.Name.Lexeme);
-            environment.Assign(stmt.Name, cls);
+
+            var methods = new Dictionary<string, LoxFunction>();
+
+            stmt.Methods.ForEach(m =>
+            {
+                var function = new LoxFunction(m, environment, m.name.Equals("init"));
+                methods.Add(m.name.Lexeme, function);
+            });
+
+            var klass = new LoxClass(stmt.Name.Lexeme, methods);
+
+            environment.Assign(stmt.Name, klass);
             return null;
         }
 
@@ -369,5 +379,11 @@ namespace cslox
             (obj as LoxInstance).Set(expr.Name, value);
             return value;
         }
+
+        public object VisitThisExpr(Expr.This expr)
+        {
+            return LookUpVariable(expr.Keyword, expr);
+        }
+
     }
 }

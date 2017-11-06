@@ -423,6 +423,8 @@ namespace cslox
                 return new Expr.Literal(Previous().Literal);
             }
 
+            if (Match(THIS)) return new Expr.This(Previous());
+
             if(Match(IDENTIFIER))
             {
                 return new Expr.Variable(Previous());

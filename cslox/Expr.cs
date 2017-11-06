@@ -14,6 +14,7 @@ namespace cslox
             T VisitLiteralExpr(Literal expr);
             T VisitLogicalExpr(Logical expr);
             T VisitSetExpr(Set expr);
+            T VisitThisExpr(This expr);
             T VisitUnaryExpr(Unary expr);
             T VisitVariableExpr(Variable expr);
         }
@@ -156,6 +157,21 @@ namespace cslox
             public readonly Expr Obj;
             public readonly Token Name;
             public readonly Expr Value;
+        }
+
+        public class This : Expr
+        {
+            public This(Token Keyword)
+            {
+                this.Keyword = Keyword;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitThisExpr(this);
+            }
+
+            public readonly Token Keyword;
         }
 
         public class Unary : Expr

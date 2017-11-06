@@ -70,13 +70,13 @@ namespace cslox
 
         internal Environment Ancestor(int dist)
         {
-            if(dist == 0)
+            var environment = this;
+            for(var i = 0; i < dist; i++)
             {
-                return this;
-            } else
-            {
-                return enclosing.Ancestor(dist - 1);
+                environment = environment.enclosing;
             }
+
+            return environment;
         }
 
 

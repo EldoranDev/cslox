@@ -13,6 +13,8 @@ namespace cslox
 
         private FunctionType currentFunction = FunctionType.NONE;
 
+        private ClassType currentClass = ClassType.NONE;
+
         public Resolver(Interpreter interpreter)
         {
             _interpreter = interpreter;
@@ -46,6 +48,27 @@ namespace cslox
         {
             Declare(stmt.Name);
             Define(stmt.Name);
+
+            var enclosingClass = currentClass;
+            currentClass = ClassType.CLASS;
+
+            BeginScope();
+            scopes.Peek().Add("this", true);
+
+            stmt.Methods.ForEach(m =>
+            {
+                var declaration = FunctionType.METHOD;
+
+                if(m.name.Lexeme == "init")
+                {
+                    declaration = FunctionType.INITIALIZER;
+                }
+                ResolveFunction(m, declaration);
+            });
+
+            currentClass = enclosingClass;
+
+            EndScope();
             return null;
         }
 
@@ -117,6 +140,10 @@ namespace cslox
             if(currentFunction == FunctionType.NONE)
             {
                 Lox.Error(stmt.Keyword, "Cannot return from top-level code.");
+            }
+            else if (currentFunction == FunctionType.INITIALIZER)
+            {
+                Lox.Error(stmt.Keyword, "cannot return a value from an initializer.");
             }
             if(stmt.Value != null)
             {
@@ -227,7 +254,7 @@ namespace cslox
         {
             for (var i = scopes.Count - 1; i >= 0; i--)
             {
-                if(scopes.ElementAt(i).ContainsKey(name.Lexeme))
+                if(scopes.Reverse().ElementAt(i).ContainsKey(name.Lexeme))
                 {
                     _interpreter.Resolve(expr, scopes.Count - 1 - i);
                     return;
@@ -247,6 +274,32 @@ namespace cslox
             Resolve(expr.Obj);
 
             return null;
+        }
+
+        public object VisitThisExpr(Expr.This expr)
+        {
+            if(currentClass == ClassType.NONE)
+            {
+                Lox.Error(expr.Keyword, "Cannot use 'this' outside of a class");
+                return null;
+            }
+
+            ResolveLocal(expr, expr.Keyword);
+            return null;
+        }
+
+        enum FunctionType
+        {
+            NONE,
+            FUNCTION,
+            INITIALIZER,
+            METHOD
+        }
+
+        private enum ClassType
+        {
+            NONE,
+            CLASS
         }
     }
 }

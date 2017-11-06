@@ -29,6 +29,7 @@ namespace cslox_generate_ast
                 "Literal : object Value",
                 "Logical: Expr Left, Token Op, Expr Right",
                 "Set : Expr Obj, Token Name, Expr Value",
+                "This: Token Keyword",
                 "Unary : Token Op, Expr Right",
                 "Variable : Token Name"
             });

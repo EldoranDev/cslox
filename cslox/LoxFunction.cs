@@ -10,13 +10,23 @@ namespace cslox
     {
         private readonly Stmt.Function _declaration;
         private readonly Environment _closure;
+        private readonly bool _isInitializer;
 
         public int Arity => _declaration.parameters.Count;
 
-        public LoxFunction(Stmt.Function declaration, Environment closure)
+        public LoxFunction(Stmt.Function declaration, Environment closure, bool isInitializer)
         {
             _declaration = declaration;
             _closure = closure;
+            _isInitializer = isInitializer;
+        }
+
+        public LoxFunction Bind(LoxInstance instance)
+        {
+            var environment = new Environment(_closure);
+
+            environment.Define("this", instance);
+            return new LoxFunction(_declaration, environment, _isInitializer);
         }
 
         public object Call(Interpreter interpreter, List<object> arguments)
@@ -35,6 +45,11 @@ namespace cslox
             catch (Return returnValue)
             {
                 return returnValue.Value;
+            }
+
+            if (_isInitializer)
+            {
+                return _closure.GetAt(0, "this");
             }
 
             return null;
